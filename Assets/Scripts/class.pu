@@ -1,0 +1,59 @@
+@startuml
+title tetris
+
+package block <<Node>>{
+}
+package tetromino <<Node>>{
+
+    class tetroMove{
+        +rotate()
+        +move()
+        +downAuto()
+        +downFast()
+    }
+
+    class tetroManager{
+        +checkOnBlock()
+        +落下後処理()
+    }
+    tetroManager --> blockManager.blockManager
+    tetroManager --> block
+    tetroManager --u> blockFactory.tetroFactory
+
+    class Input{
+    }
+    Input -> tetroMove
+
+}
+tetromino --> block
+
+package blockFactory <<Node>>{
+    class tetroFactory
+    tetroFactory --> tetromino : <<new>>
+}
+
+package blockManager <<Node>>{
+    class blockManager{
+        +checkLine()
+        +deleteLine()
+    }
+    blockManager --> Score.ScoreManager
+    blockManager -l> block
+}
+
+package gameMaster <<Node>>{
+    class gameMaster{
+        +judgeGameOver()
+    }
+    gameMaster --> block
+    gameMaster --> tetromino
+}
+
+package Score <<Node>>{
+    class ScoreManager{
+        -int highScore
+        -int score
+        +addScore()
+    }
+}
+@enduml

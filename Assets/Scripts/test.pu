@@ -1,0 +1,119 @@
+@startuml
+title udonBreaker
+
+namespace Background{
+    class Background
+}
+
+namespace common{
+    class GameMaster{
+        -int Score
+        +gameOver()
+        +addPoint()
+    }
+    GameMaster --> PlayerObject.PlayerObject
+    class SceneManager
+    class WorldParams{
+        -String playerTag
+        -String enemyTag
+    }
+}
+
+namespace UI{
+    class ScoreDisplay
+    ScoreDisplay -> common.GameMaster
+    class LifeDisplay
+    LifeDisplay --> PlayerObject.PlayerObject : Life
+    class ItemDisplay
+    ItemDisplay --> PlayerObject.PlayerObject
+}
+
+namespace PlayerObject{
+    interface IInputController{
+        +bool ShotButton
+        +bool BombButton
+        +Vector3 moveButton
+        +itemUse()
+    }
+    IInputController -l-> PlayerObject
+    class PlayerObject{
+        -int Life
+        -int BombNum
+        -Vector3 moveDirection
+        -int animeState
+        +float MoveSpeed
+        +OnColligion()
+    }
+    class PlayerMover
+    PlayerMover -u-> PlayerObject : direction
+    class PlayerShot
+    PlayerShot --> BulletObject.PlayerBullet
+    PlayerShot -u-> PlayerObject
+
+    class ItemUser{
+        +Item[] items
+        +useItem()
+        +getItem()
+    }
+    ItemUser --u> PlayerObject
+    ItemUser --> ItemObject.Item : useItem()
+    class PlayerAnimator{
+        +ダメージを受けたら点滅()
+    }
+    PlayerAnimator -u-> PlayerObject
+    
+}
+
+namespace EnemyObject{
+    class EnemyObject{
+        -int Life
+        -int point
+        +float MoveSpeed
+        +bool inCamera
+
+        +OnColligion()
+    }
+    class EnemyMover
+    EnemyMover -u-> EnemyObject
+    class EnemyShot
+    EnemyShot -u-> EnemyObject
+    EnemyShot --> BulletObject.EnemyBullet
+    class EnemyDestroyer{
+        +destroyLife()
+        +destroyRange()
+    }
+    EnemyDestroyer -l-> EnemyObject
+    EnemyDestroyer -u-> common.GameMaster
+    class EnemyInCamera
+    EnemyInCamera -r-> EnemyObject
+
+    class ItemDrop{
+        +itemDrop()
+    }
+    ItemDrop -u-> EnemyObject
+    ItemDrop --> ItemObject.Item : itemDrop()
+    class EnemyAnimator
+    EnemyAnimator -u-> EnemyObject
+}
+
+namespace BulletObject{
+    class IBullet{
+        +Vector3 direction
+        +int power
+        -move()
+        -OnColligion() : ダメージを与える
+        -destroy()
+    }
+    IBullet -> common.WorldParams
+    class PlayerBullet
+    class EnemyBullet
+    PlayerBullet --|> IBullet
+    EnemyBullet --|> IBullet
+}
+
+namespace ItemObject{
+    class Item
+}
+
+
+@enduml
